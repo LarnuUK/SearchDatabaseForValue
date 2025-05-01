@@ -58,7 +58,7 @@ Targets SQL Server 2017+
                     N'         JOIN sys.types ct ON c.user_type_id = ct.user_type_id' + @CRLF +
                     N'    WHERE ct.name IN (CONVERT(sysname,SQL_VARIANT_PROPERTY(@SearchValue,''BaseType'')),REPLACE(CONVERT(sysname,SQL_VARIANT_PROPERTY(@SearchValue,''BaseType'')),''var'',''''))' + @CRLF +
                     N'       OR (ct.name LIKE ''%int'' AND CONVERT(sysname,SQL_VARIANT_PROPERTY(@SearchValue,''BaseType'')) LIKE ''%int'')' + @CRLF +
-                    N'       OR (@DeprecatedTypes = 1 AND REPLACE(ct.name,''text'',''varchar'') IN (CONVERT(sysname,SQL_VARIANT_PROPERTY(@SearchValue,''BaseType'')),REPLACE(CONVERT(sysname,SQL_VARIANT_PROPERTY(@SearchValue,''BaseType'')),''var'','''')))' + @CRLF +
+                    N'       OR (@DeprecatedTypes = 1 AND REPLACE(REPLACE(ct.name,''text'',''varchar''),''image'',''binary'') IN (CONVERT(sysname,SQL_VARIANT_PROPERTY(@SearchValue,''BaseType'')),REPLACE(CONVERT(sysname,SQL_VARIANT_PROPERTY(@SearchValue,''BaseType'')),''var'','''')))' + @CRLF +
                     N'    GROUP BY s.name,' + @CRLF +
                     N'             t.name)' + @CRLF +
                     N'SELECT @InnerSQL = STRING_AGG(S.Statement,@CRLF)' + @CRLF +
