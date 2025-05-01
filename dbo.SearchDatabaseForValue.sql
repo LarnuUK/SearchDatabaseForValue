@@ -32,6 +32,7 @@ Targets SQL Server 2017+
     IF @WhatIf IS NULL BEGIN
         SET @ErrorMessage = FORMATMESSAGE(N'Msg 62404, Level 1, State 1' + NCHAR(10) +N'%s has a value of NULL. Behaviour will be as if the value is 0.',N'@WhatIf')
         PRINT @ErrorMessage;
+        SET @WhatIf = 0;
     END;
 
     DECLARE @VariantDataType sysname = fn.QuoteSqlvariant(@SearchValue);
