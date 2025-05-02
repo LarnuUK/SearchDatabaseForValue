@@ -40,8 +40,8 @@ Targets SQL Server 2017+
     SET @OuterSQL = N'USE ' + QUOTENAME(@DatabaseName) + N';' + @CRLF +
                     N'DECLARE @WhereDelimiter nvarchar(30) = @CRLF + N''   OR '';' + @CRLF +
                     N'WITH Statements AS(' + @CRLF +
-                    N'    SELECT N''SELECT N'' + QUOTENAME(s.name,'''''''') + N'' AS SchemaName,'' + @CRLF +' + @CRLF +
-                    N'           N''       N'' + QUOTENAME(t.name,'''''''') + N'' AS TableName,'' + @CRLF +' + @CRLF +
+                    N'    SELECT N''SELECT N'' + QUOTENAME(s.name,'''''''') + N'' AS [[SchemaName]]],'' + @CRLF +' + @CRLF +
+                    N'           N''       N'' + QUOTENAME(t.name,'''''''') + N'' AS [[TableName]]],'' + @CRLF +' + @CRLF +
                     N'           N''       *'' + @CRLF +' + @CRLF +
                     N'           N''INTO '' + QUOTENAME(CONCAT(N''#'',s.name,t.name)) + @CRLF +' + @CRLF +
                     N'           N''FROM '' + QUOTENAME(s.name) + N''.'' + QUOTENAME(t.name) + @CRLF +' + @CRLF +
