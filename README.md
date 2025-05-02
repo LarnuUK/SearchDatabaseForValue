@@ -85,6 +85,13 @@ A bit to denote that no statements should be run against the data. If set to `1`
 
 `@WhatIf` is not required. The default value is `0`; a value of `NULL` will be treated as `0` and informational warning 62404 will be raised.
 
+# Result Sets
+
+The procedure will return all rows, containing all columns, from the tables where it finds the value being searched for. Each dataset will also have 2 additional columns prefixed as their first 2 columns, to denote the schema and table names of the object the data was located in. These columns are named `[SchemaName]` and `[TableName]` respectively (note the braces are part of their name to help avoid collision).
+
+> #### Warning
+>  *If* your database does contain a column which shares a name with these two columns, `SearchDatabaseForValue` will fail.
+
 # Examples:
 
 ## Search a database for a specific word
