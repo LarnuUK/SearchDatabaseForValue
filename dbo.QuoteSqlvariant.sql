@@ -5,8 +5,7 @@ AS
 /*
 Written by Thom A 2021-03-21
 Original Source: https://wp.larnu.uk/sql_variant-and-dynamic-sql/
-Licenced under CC BY-NC-ND 4.0
-(Permission granted by Thom A to use by SEIB for Commercial Purposes)
+Licenced under CC BY-ND 4.0
 */
 BEGIN
     RETURN QUOTENAME(CONVERT(sysname,SQL_VARIANT_PROPERTY(@SQLVariant,'BaseType'))) +
