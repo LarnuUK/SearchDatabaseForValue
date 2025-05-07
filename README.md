@@ -45,7 +45,7 @@ It is recommended to define a variable to pass to the `@SearchValue` parameter w
 
 Only a single value can be searched at a time; if multiple different values need to be searched for, then multiple executions will need to be done.
 
-If either wildcard parameter is set to `1` then an equality operator (`=`) will be used, otherwise `LIKE` will be used. This means that to provide wildcards in your own string, you will need to denote a leading or trailing wildcard.
+If both wildcard parameters are set to `0` then an equality operator (`=`) will be used, otherwise `LIKE` will be used. This means that to provide wildcards in your own string, you will need to denote a leading or trailing wildcard.
 
 `@SearchValue` is required.
 
