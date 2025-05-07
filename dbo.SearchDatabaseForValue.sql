@@ -1,4 +1,4 @@
-CREATE OR ALTER PROC [dbo].[SearchDatabaseForValue] @DatabaseName sysname, --Name of database to be searched
+ALTER   PROC [dbo].[SearchDatabaseForValue] @DatabaseName sysname, --Name of database to be searched
                                       @SearchValue sql_variant, --Value to search for. Ensure that the value passed is of the correct data type
                                       @LeadingWildCard bit = 0, --Will concatenate a leading wildcard is a string based data type
                                       @TrailingWildCard bit = 0, --Will concatenate a trailing wildcard is a string based data type
@@ -56,9 +56,10 @@ Targets SQL Server 2017+
                     N'         JOIN sys.tables t ON s.schema_id = t.schema_id' + @CRLF +
                     N'         JOIN sys.columns c ON t.object_id = c.object_id' + @CRLF +
                     N'         JOIN sys.types ct ON c.user_type_id = ct.user_type_id' + @CRLF +
-                    N'    WHERE ct.name IN (CONVERT(sysname,SQL_VARIANT_PROPERTY(@SearchValue,''BaseType'')),REPLACE(CONVERT(sysname,SQL_VARIANT_PROPERTY(@SearchValue,''BaseType'')),''var'',''''))' + @CRLF +
-                    N'       OR (ct.name LIKE ''%int'' AND CONVERT(sysname,SQL_VARIANT_PROPERTY(@SearchValue,''BaseType'')) LIKE ''%int'')' + @CRLF +
-                    N'       OR (@DeprecatedTypes = 1 AND REPLACE(REPLACE(ct.name,''text'',''varchar''),''image'',''binary'') IN (CONVERT(sysname,SQL_VARIANT_PROPERTY(@SearchValue,''BaseType'')),REPLACE(CONVERT(sysname,SQL_VARIANT_PROPERTY(@SearchValue,''BaseType'')),''var'','''')))' + @CRLF +
+                    N'         JOIN sys.types st ON ct.system_type_id = st.user_type_id' + @CRLF +
+                    N'    WHERE st.name IN (CONVERT(sysname,SQL_VARIANT_PROPERTY(@SearchValue,''BaseType'')),REPLACE(CONVERT(sysname,SQL_VARIANT_PROPERTY(@SearchValue,''BaseType'')),''var'',''''))' + @CRLF +
+                    N'       OR (st.name LIKE ''%int'' AND CONVERT(sysname,SQL_VARIANT_PROPERTY(@SearchValue,''BaseType'')) LIKE ''%int'')' + @CRLF +
+                    N'       OR (@DeprecatedTypes = 1 AND REPLACE(REPLACE(st.name,''text'',''varchar''),''image'',''binary'') IN (CONVERT(sysname,SQL_VARIANT_PROPERTY(@SearchValue,''BaseType'')),REPLACE(CONVERT(sysname,SQL_VARIANT_PROPERTY(@SearchValue,''BaseType'')),''var'','''')))' + @CRLF +
                     N'    GROUP BY s.name,' + @CRLF +
                     N'             t.name)' + @CRLF +
                     N'SELECT @InnerSQL = STRING_AGG(S.Statement,@CRLF)' + @CRLF +
@@ -70,4 +71,3 @@ Targets SQL Server 2017+
 
     EXEC sys.sp_executesql @OuterSQL, N'@SearchValue sql_variant, @VariantDataType sysname, @LeadingWildCard bit, @TrailingWildCard bit, @DeprecatedTypes bit, @CRLF nchar(2), @InnerSQL nvarchar(MAX) OUTPUT, @WhatIf bit', @SearchValue, @VariantDataType, @LeadingWildCard, @TrailingWildCard, @DeprecatedTypes, @CRLF, @InnerSQL OUTPUT, @WhatIf;
 END;
-GO
