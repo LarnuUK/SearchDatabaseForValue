@@ -35,7 +35,7 @@ Targets SQL Server 2017+
         SET @WhatIf = 0;
     END;
 
-    DECLARE @VariantDataType sysname = fn.QuoteSqlvariant(@SearchValue);
+    DECLARE @VariantDataType sysname = dbo.QuoteSqlvariant(@SearchValue);
 
     SET @OuterSQL = N'USE ' + QUOTENAME(@DatabaseName) + N';' + @CRLF +
                     N'DECLARE @WhereDelimiter nvarchar(30) = @CRLF + N''   OR '';' + @CRLF +
