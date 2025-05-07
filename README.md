@@ -7,7 +7,7 @@ SQL Server 2017+
 Azure SQL Database is not supported, as these are contained databases, and do not allow for use of USE statements or 3+ part naming on objects.
 
 # Deployment 
-Execute the `dbo.SearchDatabaseForValue.sql` in your desired database. The schema can be changed from `dbo` without issue.
+Execute the `dbo.QuoteSqlvariant.sql` and then `dbo.SearchDatabaseForValue.sql` scripts in your desired database. The schema can be changed from `dbo` without issue (ensure that if you deploy `QuoteSqlvariant` to a different schema that you update the schema in `SearchDatabaseForValue`'s definition).
 
 # Usage
 
