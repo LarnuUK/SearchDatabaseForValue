@@ -26,7 +26,8 @@ Targets SQL Server 2017+
     --*/
 
     DECLARE @CRLF nchar(2) = NCHAR(13) + NCHAR(10),
-            @ErrorMessage nvarchar(2047);
+            @ErrorMessage nvarchar(2047),
+            @ProcName nvarchar(516) = QUOTENAME(@DatabaseName) + N'.sys.sp_executesql';
     IF NOT EXISTS (SELECT 1 FROM sys.databases WHERE name = @DatabaseName) BEGIN
         SET @ErrorMessage = FORMATMESSAGE(N'Database ''%s'' does not exist.', @DatabaseName);
         THROW 78001, @ErrorMessage, 16;
@@ -52,8 +53,7 @@ Targets SQL Server 2017+
 
     DECLARE @VariantDataType sysname = dbo.QuoteSqlvariant(@SearchValue);
 
-    SET @OuterSQL = N'USE ' + QUOTENAME(@DatabaseName) + N';' + @CRLF +
-                    N'DECLARE @WhereDelimiter nvarchar(30) = @CRLF + N''   OR '';' + @CRLF +
+    SET @OuterSQL = N'DECLARE @WhereDelimiter nvarchar(30) = @CRLF + N''   OR '';' + @CRLF +
                     N'WITH Statements AS(' + @CRLF +
                     N'    SELECT N''SELECT N'' + QUOTENAME(s.name,'''''''') + N'' AS [[SchemaName]]],'' + @CRLF +' + @CRLF +
                     N'           N''       N'' + QUOTENAME(t.name,'''''''') + N'' AS [[TableName]]],'' + @CRLF +' + @CRLF +
@@ -78,10 +78,10 @@ Targets SQL Server 2017+
                     N'SELECT @InnerSQL = STRING_AGG(S.Statement,@CRLF)' + @CRLF +
                     N'FROM Statements S;' + @CRLF + 
                     N'IF @WhatIf = 0' + @CRLF + 
-                    N'    EXEC sys.sp_executesql @InnerSQL, N''@SearchValue sql_variant'', @SearchValue;';
+                    N'    EXEC @ProcName @InnerSQL, N''@SearchValue sql_variant'', @SearchValue;';
 
 
-    EXEC sys.sp_executesql @OuterSQL, N'@SearchValue sql_variant, @VariantDataType sysname, @SearchIsPattern bit, @DeprecatedTypes bit, @CRLF nchar(2), @InnerSQL nvarchar(MAX) OUTPUT, @WhatIf bit', @SearchValue, @VariantDataType, @SearchIsPattern, @DeprecatedTypes, @CRLF, @InnerSQL OUTPUT, @WhatIf;
+    EXEC @ProcName @OuterSQL, N'@SearchValue sql_variant, @VariantDataType sysname, @SearchIsPattern bit, @DeprecatedTypes bit, @CRLF nchar(2), @ProcName nvarchar(516), @InnerSQL nvarchar(MAX) OUTPUT, @WhatIf bit', @SearchValue, @VariantDataType, @SearchIsPattern, @DeprecatedTypes, @CRLF, @ProcName, @InnerSQL OUTPUT, @WhatIf;
 
     --PRINT @OuterSQL;
     --PRINT @InnerSQL;
