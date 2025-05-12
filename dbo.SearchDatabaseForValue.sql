@@ -1,4 +1,4 @@
-ALTER   PROC [dbo].[SearchDatabaseForValue] @DatabaseName sysname, --Name of database to be searched
+CREATE OR ALTER PROC [dbo].[SearchDatabaseForValue] @DatabaseName sysname, --Name of database to be searched
                                       @SearchValue sql_variant, --Value to search for. Ensure that the value passed is of the correct data type
                                       @LeadingWildCard bit = 0, --Will concatenate a leading wildcard is a string based data type
                                       @TrailingWildCard bit = 0, --Will concatenate a trailing wildcard is a string based data type
