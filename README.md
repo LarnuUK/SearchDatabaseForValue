@@ -4,7 +4,7 @@ A procedure to search an entire database for a specific value.
 # Requirements
 SQL Server 2017+
 
-Azure SQL Database is not supported, as these are contained databases, and do not allow for use of USE statements or 3+ part naming on objects.
+Azure SQL Database is supported, provided that the database name parameter is the same as the database that the procedure is created is.
 
 # Deployment 
 Execute the `dbo.QuoteSqlvariant.sql` and then `dbo.SearchDatabaseForValue.sql` scripts in your desired database. The schema can be changed from `dbo` without issue (ensure that if you deploy `QuoteSqlvariant` to a different schema that you update the schema in `SearchDatabaseForValue`'s definition).
