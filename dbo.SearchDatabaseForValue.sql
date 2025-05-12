@@ -1,11 +1,12 @@
+--/*
 CREATE OR ALTER PROC [dbo].[SearchDatabaseForValue] @DatabaseName sysname, --Name of database to be searched
                                       @SearchValue sql_variant, --Value to search for. Ensure that the value passed is of the correct data type
-                                      @LeadingWildCard bit = 0, --Will concatenate a leading wildcard is a string based data type
-                                      @TrailingWildCard bit = 0, --Will concatenate a trailing wildcard is a string based data type
+                                      @SearchIsPattern bit = 0, --Denotes that the @SeachValue contain a pattern, meaning a LIKE will be used.
                                       @DeprecatedTypes bit = 0, --Will include deprecated data types, (n)text and image, if enabled. Could have performance impacts
                                       @OuterSQL nvarchar(MAX) = NULL OUTPUT, --The "outer" dynamic statementm the one that builds the searching SQL
                                       @InnerSQL nvarchar(MAX) = NULL OUTPUT, --The actual SQL that runs against the other database
                                       @WhatIf bit = 0 AS --provide 1 to not actually search the database
+--*/
 BEGIN
 /*
 Written by Thom A 2024-02-15
@@ -17,9 +18,11 @@ Targets SQL Server 2017+
     /*
     DECLARE @DatabaseName sysname,
             @SearchValue sql_variant,
-            @LeadingWildCard bit = 1,
-            @TrailingWildCard bit = 1,
-            @DeprecatedTypes bit = 0;
+            @SearchIsPattern bit = 0,
+            @DeprecatedTypes bit = 0,
+            @OuterSQL nvarchar(MAX),
+            @InnerSQL nvarchar(MAX),
+            @WhatIf bit = 1;
     --*/
 
     DECLARE @CRLF nchar(2) = NCHAR(13) + NCHAR(10),
@@ -27,6 +30,18 @@ Targets SQL Server 2017+
     IF NOT EXISTS (SELECT 1 FROM sys.databases WHERE name = @DatabaseName) BEGIN
         SET @ErrorMessage = FORMATMESSAGE(N'Database ''%s'' does not exist.', @DatabaseName);
         THROW 78001, @ErrorMessage, 16;
+    END;
+
+    IF @DeprecatedTypes IS NULL BEGIN
+        SET @ErrorMessage = FORMATMESSAGE(N'Msg 62404, Level 1, State 1' + NCHAR(10) +N'%s has a value of NULL. Behaviour will be as if the value is 0.',N'@DeprecatedTypes')
+        PRINT @ErrorMessage;
+        SET @DeprecatedTypes = 0;
+    END;
+
+    IF @SearchIsPattern IS NULL BEGIN
+        SET @ErrorMessage = FORMATMESSAGE(N'Msg 62404, Level 1, State 1' + NCHAR(10) +N'%s has a value of NULL. Behaviour will be as if the value is 0.',N'@SearchIsPattern')
+        PRINT @ErrorMessage;
+        SET @SearchIsPattern = 0;
     END;
     
     IF @WhatIf IS NULL BEGIN
@@ -46,10 +61,8 @@ Targets SQL Server 2017+
                     N'           N''INTO '' + QUOTENAME(CONCAT(N''#'',s.name,t.name)) + @CRLF +' + @CRLF +
                     N'           N''FROM '' + QUOTENAME(s.name) + N''.'' + QUOTENAME(t.name) + @CRLF +' + @CRLF +
                     N'           N''WHERE '' + STRING_AGG(CONVERT(nvarchar(MAX),N'''') + ' + @CRLF +
-                    N'                                    QUOTENAME(c.name) + CASE WHEN 1 IN (@LeadingWildCard,@TrailingWildCard) THEN N'' LIKE '' ELSE '' = '' END +' + @CRLF +
-                    N'                                    CASE WHEN @LeadingWildCard = 1 AND CONVERT(sysname,SQL_VARIANT_PROPERTY(@SearchValue,''BaseType'')) LIKE ''%char'' THEN N''''''%''''+'' ELSE N'''' END + ' + @CRLF +
-                    N'                                    N''CONVERT('' + @VariantDataType + N'',@SearchValue)'' + ' + @CRLF +
-                    N'                                    CASE WHEN @TrailingWildCard = 1 AND CONVERT(sysname,SQL_VARIANT_PROPERTY(@SearchValue,''BaseType'')) LIKE ''%char''  THEN N''+''''%'''''' ELSE N'''' END, @WhereDelimiter) + N'';'' + @CRLF +' + @CRLF +
+                    N'                                    QUOTENAME(c.name) + CASE WHEN @SearchIsPattern = 1 AND CONVERT(sysname,SQL_VARIANT_PROPERTY(@SearchValue,''BaseType'')) LIKE ''%char'' THEN N'' LIKE '' ELSE N'' = '' END +' + @CRLF +
+                    N'                                    N''CONVERT('' + @VariantDataType + N'',@SearchValue)'', @WhereDelimiter) + N'';'' + @CRLF +' + @CRLF +
                     N'           N''IF EXISTS (SELECT 1 FROM '' + QUOTENAME(CONCAT(N''#'',s.name,t.name)) + N'') SELECT * FROM '' + QUOTENAME(CONCAT(N''#'',s.name,t.name)) + N'';'' + @CRLF +' + @CRLF +
                     N'           N''DROP TABLE '' + QUOTENAME(CONCAT(N''#'',s.name,t.name)) + N'';'' AS Statement' + @CRLF +
                     N'    FROM sys.schemas s' + @CRLF +
@@ -67,7 +80,9 @@ Targets SQL Server 2017+
                     N'IF @WhatIf = 0' + @CRLF + 
                     N'    EXEC sys.sp_executesql @InnerSQL, N''@SearchValue sql_variant'', @SearchValue;';
 
-    --PRINT @OuterSQL;
 
-    EXEC sys.sp_executesql @OuterSQL, N'@SearchValue sql_variant, @VariantDataType sysname, @LeadingWildCard bit, @TrailingWildCard bit, @DeprecatedTypes bit, @CRLF nchar(2), @InnerSQL nvarchar(MAX) OUTPUT, @WhatIf bit', @SearchValue, @VariantDataType, @LeadingWildCard, @TrailingWildCard, @DeprecatedTypes, @CRLF, @InnerSQL OUTPUT, @WhatIf;
+    EXEC sys.sp_executesql @OuterSQL, N'@SearchValue sql_variant, @VariantDataType sysname, @SearchIsPattern bit, @DeprecatedTypes bit, @CRLF nchar(2), @InnerSQL nvarchar(MAX) OUTPUT, @WhatIf bit', @SearchValue, @VariantDataType, @SearchIsPattern, @DeprecatedTypes, @CRLF, @InnerSQL OUTPUT, @WhatIf;
+
+    --PRINT @OuterSQL;
+    --PRINT @InnerSQL;
 END;

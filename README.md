@@ -18,14 +18,13 @@ It is highly recommend to use a variable of the desired data type to pass to the
 ```sql
 [DECLARE @<SearchValue> <data type> = <search value> [;]]
 
-EXECUTE dbo.SearchDatabaseForValue [@DatabaseName =] <sysname>
-                                   , [ @SearchValue = ] <sql_variant>
-                                   [, @LeadingWildCard = <bit>]
-                                   [, @TrailingWildCard = <bit>]
-                                   [, @DeprecatedTypes = <bit>]
-                                   [, @OuterSQL = <nvarchar> OUTPUT]
-                                   [, @InnerSQL = <nvarchar> OUTPUT]
-                                   [, @WhatIf = <bit>][;]
+[ EXECUTE | EXEC ] dbo.SearchDatabaseForValue [@DatabaseName =] <sysname>
+                                              , [ @SearchValue = ] <sql_variant>
+                                              [, @SearchIsPattern = <bit>]
+                                              [, @DeprecatedTypes = <bit>]
+                                              [, @OuterSQL = <nvarchar> OUTPUT]
+                                              [, @InnerSQL = <nvarchar> OUTPUT]
+                                              [, @WhatIf = <bit>][;]
 ```
 
 ## Arguments
@@ -45,27 +44,19 @@ It is recommended to define a variable to pass to the `@SearchValue` parameter w
 
 Only a single value can be searched at a time; if multiple different values need to be searched for, then multiple executions will need to be done.
 
-If both wildcard parameters are set to `0` then an equality operator (`=`) will be used, otherwise `LIKE` will be used. This means that to provide wildcards in your own string, you will need to denote a leading or trailing wildcard.
-
 `@SearchValue` is required.
 
-### @LeadingWildCard
+### @SearchIsPattern
 
-Places a multi-character wildcard (`%`) before the search value, and uses a `LIKE` expression instead of an `=`, therefore enabling use of wildcard usage in `@SearchValue`. Due to the use of a leading wildcard, this will result in slower performance, due to non-SARGablity.
+Cause a a `LIKE` expression instead of an `=` to be used for the filter predicate, therefore enabling use of wildcard usage in `@SearchValue`. Has no affect if `@SearchValue` is not a `(n)(var)char`.
 
-`@LeadingWildCard` is not required and defaults to `0`.
-
-### @TrailingWildCard
-
-Places a multi-character wildcard (`%`) after the search value, and uses a `LIKE` expression instead of an `=`, therefore enabling use of wildcard usage in `@SearchValue`.
-
-`@TrailingWildCard` is not required and defaults to `0`.
+`@SearchIsPattern` is not required and defaults to `0`; a value of `NULL` will be treated as `0` and informational warning 62404 will be raised.
 
 ### @DeprecatedTypes
 
 Will also search `(n)text` and `image` data types if an appropriate data type is passed to `@SearchValue`. Enabling `@DeprecatedTypes` may result is (significantly) slower performance on environments where the data type(s) have been used extensively, as they are unable to be indexed.
 
-`@DeprecatedTypes` is not required and defaults to `0`.
+`@DeprecatedTypes` is not required and defaults to `0`; a value of `NULL` will be treated as `0` and informational warning 62404 will be raised.
 
 ### @OuterSQL
 
@@ -101,14 +92,14 @@ Search a database for a specific `nvarchar` value `N'Chloe'`; this will only sea
 EXEC dbo.SearchDatabaseForValue N'MyDatabase', N'Chloe';
 ```
 
-## Search for values starting with a value, included deprecate types
+## Search for values starting with a value, including deprecate types
 
-Search `varchar` and `char` columns in the database `YourDatabase` for values that start with `'Hotel'`. This will index `text` columns, due to the enabled of `@DeprecatedTypes`:
+Search `varchar` and `char` columns in the database `YourDatabase` for values that start with `'Hotel'`. This will include `text` columns, due to the enabled of `@DeprecatedTypes`:
 ```sql
 
 EXEC dbo.SearchDatabaseForValue @DatabaseName = N'YourDatabase',
-                                @SearchValue = 'Hotel'
-                                @TrailingWildCard = 1,
+                                @SearchValue = 'Hotel%'
+                                @SearchIsPattern = 1,
                                 @DeprecatedTypes = 1;
 ```
 
@@ -117,9 +108,8 @@ EXEC dbo.SearchDatabaseForValue @DatabaseName = N'YourDatabase',
 Search `varchar` and `char` columns in the database `YourDatabase` that contain a value where `12` followed by any character and then `45`. 
 ```sql
 EXEC dbo.SearchDatabaseForValue @DatabaseName = N'YourDatabase',
-                                @SearchValue = '12_45'
-                                @LeadingWildCard = 1,
-                                @TrailingWildCard = 1;
+                                @SearchValue = '%12_45%'
+                                @SearchIsPattern = 1;
 ```
 
 ## Search for a specific date and time value
