@@ -1,4 +1,7 @@
-
+# 2025-05-13
+Add version that uses the old `FOR XML PATH` (and `STUFF`) method, for SQL Server 2016, and prior, environments; `dbo.SearchDatababaseForValue_XML`.
+> #### Note
+> This version is likely to also be deprecated almost immediately.
 
 # 2025-05-12 
 Switch to parameterised procedure name, rather than a `USE` statement.

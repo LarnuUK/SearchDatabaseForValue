@@ -2,12 +2,13 @@
 A procedure to search an entire database for a specific value.
 
 # Requirements
-SQL Server 2017+
+SQL Server 2017+ - dbo.SearchDatabaseForValue
+SQL Server 2008+ - dbo.SearchDatabaseForValue_XML
 
 Azure SQL Database is supported, provided that the database name parameter is the same as the database that the procedure is created is.
 
 # Deployment 
-Execute the `dbo.QuoteSqlvariant.sql` and then `dbo.SearchDatabaseForValue.sql` scripts in your desired database. The schema can be changed from `dbo` without issue (ensure that if you deploy `QuoteSqlvariant` to a different schema that you update the schema in `SearchDatabaseForValue`'s definition).
+Execute the `dbo.QuoteSqlvariant.sql` and then `dbo.SearchDatabaseForValue.sql` and/or `dbo.SearchDatabaseForValue_XML.sql` scripts in your desired database. The schema can be changed from `dbo` without issue (ensure that if you deploy `QuoteSqlvariant` to a different schema that you update the schema in `SearchDatabaseForValue`'s definition).
 
 # Usage
 
@@ -18,13 +19,13 @@ It is highly recommend to use a variable of the desired data type to pass to the
 ```sql
 [DECLARE @<SearchValue> <data type> = <search value> [;]]
 
-[ EXECUTE | EXEC ] dbo.SearchDatabaseForValue [@DatabaseName =] <sysname>
-                                              , [ @SearchValue = ] <sql_variant>
-                                              [, @SearchIsPattern = <bit>]
-                                              [, @DeprecatedTypes = <bit>]
-                                              [, @OuterSQL = <nvarchar> OUTPUT]
-                                              [, @InnerSQL = <nvarchar> OUTPUT]
-                                              [, @WhatIf = <bit>][;]
+[ EXECUTE | EXEC ] dbo.SearchDatabaseForValue[_XML] [@DatabaseName =] <sysname>
+                                                    , [ @SearchValue = ] <sql_variant>
+                                                    [, @SearchIsPattern = <bit>]
+                                                    [, @DeprecatedTypes = <bit>]
+                                                    [, @OuterSQL = <nvarchar> OUTPUT]
+                                                    [, @InnerSQL = <nvarchar> OUTPUT]
+                                                    [, @WhatIf = <bit>][;]
 ```
 
 ## Arguments
