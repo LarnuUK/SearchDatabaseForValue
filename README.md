@@ -2,13 +2,13 @@
 A procedure to search an entire database for a specific value.
 
 # Requirements
-SQL Server 2017+ - dbo.SearchDatabaseForValue
-SQL Server 2008+ - dbo.SearchDatabaseForValue_XML
+SQL Server 2017+ - SearchDatabaseForValue
+SQL Server 2008+ - SearchDatabaseForValue_XML
 
 Azure SQL Database is supported, provided that the database name parameter is the same as the database that the procedure is created is.
 
 # Deployment 
-Execute the `dbo.QuoteSqlvariant.sql` and then `dbo.SearchDatabaseForValue.sql` and/or `dbo.SearchDatabaseForValue_XML.sql` scripts in your desired database. The schema can be changed from `dbo` without issue (ensure that if you deploy `QuoteSqlvariant` to a different schema that you update the schema in `SearchDatabaseForValue`'s definition).
+Execute the `QuoteSqlvariant.sql` (within `fn/Functions`) and then `SearchDatabaseForValue.sql` and/or `SearchDatabaseForValue_XML.sql` scripts (within `sp/StoredProcedures`) in your desired database. The schemas can be changed without issue (ensure that if you deploy `QuoteSqlvariant` to a different schema that you update the schema in `SearchDatabaseForValue`'s definition).
 
 # Usage
 

@@ -1,3 +1,6 @@
+# 2025-06-17
+Move to DB project style and put (back) into respective schemas.
+
 # 2025-05-13
 Add version that uses the old `FOR XML PATH` (and `STUFF`) method, for SQL Server 2016, and prior, environments; `dbo.SearchDatababaseForValue_XML`.
 > #### Note

@@ -1,5 +1,5 @@
 --/*
-CREATE OR ALTER PROC [dbo].[SearchDatabaseForValue] @DatabaseName sysname, --Name of database to be searched
+CREATE OR ALTER PROC [sp].[SearchDatabaseForValue] @DatabaseName sysname, --Name of database to be searched
                                       @SearchValue sql_variant, --Value to search for. Ensure that the value passed is of the correct data type
                                       @SearchIsPattern bit = 0, --Denotes that the @SeachValue contain a pattern, meaning a LIKE will be used.
                                       @DeprecatedTypes bit = 0, --Will include deprecated data types, (n)text and image, if enabled. Could have performance impacts
@@ -51,7 +51,7 @@ Targets SQL Server 2017+
         SET @WhatIf = 0;
     END;
 
-    DECLARE @VariantDataType sysname = dbo.QuoteSqlvariant(@SearchValue);
+    DECLARE @VariantDataType sysname = fn.QuoteSqlvariant(@SearchValue);
 
     SET @OuterSQL = N'DECLARE @WhereDelimiter nvarchar(30) = @CRLF + N''   OR '';' + @CRLF +
                     N'WITH Statements AS(' + @CRLF +

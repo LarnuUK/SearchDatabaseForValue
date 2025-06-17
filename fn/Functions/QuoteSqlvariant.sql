@@ -1,4 +1,4 @@
-CREATE OR ALTER FUNCTION [dbo].[QuoteSqlvariant] (@SQLVariant sql_variant) 
+CREATE OR ALTER FUNCTION [fn].[QuoteSqlvariant] (@SQLVariant sql_variant) 
 RETURNS nvarchar(258) 
 WITH SCHEMABINDING
 AS 
